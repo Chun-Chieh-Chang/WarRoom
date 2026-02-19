@@ -59,3 +59,18 @@
   - 實作 **`DistillationManager.ts`**：定期將原始經驗提煉為 3 條「導向原則」。
   - 升級 `FlywheelController` 為 **Constitutional Edition**：決策內閣現在必須優先遵循「系統憲法」進行辯論。
 - **成果**：系統具備了元認知能力。它不再只是單純執行，而是根據歷史自我總結出一套「價值觀」，並依此指導未來的行為，達成了真正意義上的自主增長。
+
+### [2026-02-19] 持續部署與 GitHub Pages 自動化 (CI/CD Setup)
+
+- **目標**：實現自動化部署，降低發布阻力，具體落實飛輪系統中的「自動化」原則。
+- **問題**：首次提交時發生 Pre-commit Hook (Husky + Vitest) 失敗。
+- **根本原因**：
+  1. 系統中存在由 Plop 模板生成的佔位檔案 `ReputationAsset.ts` 與 `ReputationAsset.test.ts`，其內容包含未經替換的 `{{pascalCase name}}` 語法，導致 TypeScript 編譯與測試失敗。
+  2. 檔案編碼異常（UTF-16），導致工具鏈讀取錯誤。
+- **矯正措施**：
+  - 手動清理損壞的模板實例檔案，確保測試環境 (Vitest) 100% 通過。
+  - 建立 `.github/workflows/static.yml`，設定 GitHub Actions 自動將 `src/web` 目錄推送至 GitHub Pages。
+  - 配置 `.gitignore` 排除 `node_modules`、`dist` 等非原始碼檔案。
+- **成果**：
+  - 專案成功推送至 GitHub。
+  - [戰略大腦會議室 Live Demo](https://Chun-Chieh-Chang.github.io/WarRoom/) 已上線並實現自動化更新。
