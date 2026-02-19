@@ -641,10 +641,17 @@
       async function loadTeam() {
         try {
           const res = await fetch('/api/team');
+          if (!res.ok) throw new Error(`API returned ${res.status}`);
+          
+          const contentType = res.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("API did not return JSON");
+          }
+          
           currentTeam = await res.json();
           renderTeam();
         } catch (err) {
-          console.error('Failed to load team', err);
+          console.warn('Backend API not available (Normal on GitHub Pages), using default team.');
         }
       }
 
@@ -809,6 +816,11 @@
       async function loadHistory() {
         try {
           const res = await fetch('/api/experience');
+          if (!res.ok) return; // Silent return for 404
+          
+          const contentType = res.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) return;
+
           const exps = await res.json();
           const list = document.getElementById('experienceList');
           if (!list) return;
