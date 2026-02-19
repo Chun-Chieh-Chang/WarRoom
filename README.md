@@ -1,5 +1,8 @@
 # CompoundEffect 專案憲章
 
+[![Deploy static content to Pages](https://github.com/Chun-Chieh-Chang/WarRoom/actions/workflows/static.yml/badge.svg)](https://github.com/Chun-Chieh-Chang/WarRoom/actions/workflows/static.yml)
+[Live Demo](https://Chun-Chieh-Chang.github.io/WarRoom/)
+
 ## 1. 願景
 
 建立一個能夠展現 **「複利效應」（正向強化循環）** 的軟體系統，讓每一次的迭代、使用者互動與每一行代碼，都能隨時間推移，為系統價值與效用帶來指數級的增長。
