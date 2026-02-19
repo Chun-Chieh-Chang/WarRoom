@@ -74,3 +74,20 @@
 - **成果**：
   - 專案成功推送至 GitHub。
   - [戰略大腦會議室 Live Demo](https://Chun-Chieh-Chang.github.io/WarRoom/) 已上線並實現自動化更新。
+
+### [2026-02-20] 靜態環境容錯優化 (Static Environment Resilience)
+
+- **問題**：在 GitHub Pages 上發生 `404 Not Found` 引發的 JSON 解析錯誤 (`Unexpected token '<'`)。
+- **根本原因**：靜態託管環境缺乏後端 API，前端 `fetch` 抓取到 404 HTML 頁面並嘗試解析為 JSON。
+- **矯正措施**：
+  - 在 `index.html` 的 `loadTeam` 與 `loadHistory` 中加入 `res.ok` 與 `content-type` 檢查。
+  - 實作「優雅降級」：當 API 不可用時，自動切換至前端預設的 AI 角色配置，不中斷 UI 渲染。
+- **成果**：消除 Live Demo 的 Console 錯誤，確保跨環境（本地 vs 靜態託管）的穩定性。
+
+### [2026-02-20] 專案結構清理 (Project Cleanup & MECE Alignment)
+
+- **目標**：遵循 MECE 原則整理檔案結構，消除冗餘檔案（Anti-bloat）。
+- **操作**：
+  - 移除根目錄冗餘檔案：`temp_index.html`、`debug_db.js`。
+  - 清理 `src/` 目錄：移除原型階段之模擬腳本 (`ai_simulation.ts` 等)，使核心源碼更專注於生產環境。
+- **成果**：專案結構更清晰，降低後續開發的認知負荷。
