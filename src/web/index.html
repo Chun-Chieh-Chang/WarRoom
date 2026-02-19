@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://cdn.jsdelivr.net;">
+    <title>AI BRAINSTORMING | 戰略大腦會議室</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --accent-color: #00f2ff;
+            --accent-purple: #ff00ff;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 4px;
+            color: var(--accent-color);
+            margin: 0;
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+
+        .guide-btn {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .guide-btn:hover {
+            background: var(--accent-color);
+            color: black;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+
+        .trigger-btn {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-purple));
+            border: none;
+            color: black;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            margin-left: 15px;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        }
+
+        .trigger-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.6);
+        }
+
+        .trigger-btn:active { transform: scale(0.95); }
+
+        .trigger-btn:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .card-full { grid-column: span 2; }
+
+        h2 {
+            font-size: 1rem;
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+        .experience-list {
+            max-height: 350px;
+            overflow-y: auto;
+            list-style: none;
+            padding: 0;
+        }
+
+        .experience-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s;
+        }
+
+        .experience-item:hover { background: rgba(255,255,255,0.02); }
+
+        .badge {
+            background: var(--accent-color);
+            color: black;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+
+        .lesson {
+            display: block;
+            color: var(--text-dim);
+            margin-top: 8px;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 8px;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+
+        .thinking-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(111, 66, 193, 0.2);
+            border-top: 2px solid var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 彈窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: #0f0f0f;
+            margin: 5% auto;
+            padding: 40px;
+            border: 1px solid var(--accent-color);
+            width: 80%;
+            max-width: 800px;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2);
+        }
+
+        .close {
+            color: var(--text-dim);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover { color: white; }
+
+        .guide-body { line-height: 1.8; color: #ccc; }
+        .guide-body h2 { color: var(--accent-color); font-size: 1.3rem; margin-top: 30px; border: none; padding: 0; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>AI BRAINSTORMING <span style="font-weight: 300; opacity: 0.6;">WAR ROOM</span> <span id="currentSessionTopic" style="font-size: 1rem; color: var(--accent-color); margin-left: 20px;">[等待議題...]</span></h1>
+        <div>
+            <button class="guide-btn" onclick="openGuide()">平台說明 [HELP]</button>
+            <button id="startSessionBtn" class="trigger-btn" onclick="startBrainstorm()">開啟腦力激盪 [GO]</button>
+            <button onclick="location.reload()" style="background: none; border: 1px solid #444; color: #666; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; margin-left: 10px;">強刷新 [RESET UI]</button>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        
+        <!-- 系統指揮中心 (System Command Center) -->
+        <div class="card card-full" style="border: 1px solid var(--accent-color); background: rgba(0, 242, 255, 0.02);">
+            <h2 style="color: var(--accent-color);">系統指揮中心 (System Command Center)</h2>
+            <div style="display: flex; gap: 20px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">切換會議主題 (Switch Theme)</label>
+                    <select id="assetSwitcher" onchange="switchAsset(this.value)" style="width: 100%; background: #111; border: 1px solid #333; color: white; padding: 10px; border-radius: 5px; cursor: pointer;">
+                        <option value="default">預設主題</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主理人控制台 (Master Console) -->
+        <div class="card card-full" style="border: 1px solid var(--accent-color); background: rgba(0, 242, 255, 0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="color: var(--accent-color); margin: 0;">主理人控制台 (Master Console)</h2>
+                <select id="scenarioSelector" onchange="loadScenario()" style="background: #000; color: var(--accent-purple); border: 1px solid var(--accent-purple); padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.9rem;">
+                    <option value="">📂 載入戰略劇本 (Load Playbook)...</option>
+                    <optgroup label="💼 商業與職場 (Business & Career)">
+                        <option value="crisis">🔥 【危機公關】品牌聲譽修復</option>
+                        <option value="launch">🚀 【產品發布】AI 新產品上市</option>
+                        <option value="reform">⚔️ 【組織變革】企業轉型與裁員</option>
+                        <option value="blue_ocean">🌊 【藍海策略】尋找未開發市場</option>
+                        <option value="manage">🤝 【團隊管理】衝突調解與激勵</option>
+                        <option value="career">🎓 【職涯發展】中年轉職與升遷</option>
+                        <option value="negotiate">🎙️ 【溝通談判】高風險商務談判</option>
+                    </optgroup>
+                    <optgroup label="🌱 生活與成長 (Life & Self-Growth)">
+                        <option value="learning">🧠 【學習成長】跨領域技能速成</option>
+                        <option value="finance">💰 【財務自由】退休資產配置</option>
+                        <option value="health">💪 【健康生活】減重與體能優化</option>
+                        <option value="travel">✈️ 【家庭旅遊】複雜行程規劃</option>
+                    </optgroup>
+                </select>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label style="display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">針對議題目標 (Session Goal / Directive)</label>
+                    <input type="text" id="sessionTopic" placeholder="議題主題，例如: 品牌轉型策略" style="width: 100%; background: #000; border: 1px solid var(--accent-color); color: white; padding: 12px; border-radius: 5px; font-size: 1rem; margin-bottom: 10px;">
+                    <textarea id="sessionContext" placeholder="討論目標或補充背景... (會議中可隨時修改並按更新)" style="width: 100%; height: 60px; background: #000; border: 1px solid #333; color: white; padding: 10px; border-radius: 5px; resize: none;"></textarea>
+                </div>
+                <div style="display: flex; flex-direction: column; justify-content: flex-end; gap: 10px;">
+                    <button id="updateGoalBtn" onclick="updateSessionGoal()" disabled style="background: rgba(255,255,255,0.1); color: #888; border: 1px solid #444; padding: 10px; border-radius: 5px; cursor: pointer;">隨時更新目標 [UPDATE GOAL]</button>
+                    <div style="font-size: 0.75rem; color: #555;">* 會議進行中修改上方描述後按 [UPDATE] 可即時改變 AI 討論方向</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 團隊配置窗 (Team Roster) -->
+        <div class="card card-full">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2>AI 戰略團隊配置 (Team Roster)</h2>
+                <button onclick="addTeamMember()" style="background: var(--accent-purple); color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">+ 新增 AI 成員</button>
+            </div>
+            <div id="teamContainer" style="display: flex; flex-wrap: wrap; gap: 15px;">
+                <!-- Team cards injected here -->
+            </div>
+        </div>
+
+        <!-- 即時動態視窗區 (Dynamic Live Windows) -->
+        <div id="brainstormField" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px; grid-column: span 2;">
+            <!-- AI opinion boxes injected here -->
+        </div>
+
+        <!-- 首席戰略官總結 (Synthesis & Action Plan) -->
+        <div id="summarySection" class="card card-full" style="display: none; border: 2px solid var(--accent-purple); background: rgba(111, 66, 193, 0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--accent-purple); margin: 0;">🎯 首席戰略官：全案整合決議 (Action Plan)</h2>
+                <div id="summarySpinner" class="thinking-spinner"></div>
+            </div>
+            <div id="summaryBox" style="font-size: 1rem; line-height: 1.8; color: #eee; white-space: pre-wrap; padding: 20px; background: #000; border-radius: 10px; border: 1px solid #333;">
+                正在等待團隊初步討論...
+            </div>
+        </div>
+        
+        <!-- 會議紀錄 (Session Logs) -->
+        <div class="card card-full">
+            <h2>歷史會議精華 (Past Session Insights)</h2>
+            <ul id="experienceList" class="experience-list">
+                <!-- Session results injected here -->
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- 指南彈窗 (Help Modal) -->
+    <div id="guideModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGuide()">&times;</span>
+            <div id="guideContent" class="guide-body">
+                <h2>AI 戰略大腦會議室 使用指南</h2>
+                <p>歡迎來到 AI 集體決策平台。在這裡，您是最高主理人（Master），負責設定議題並指導您的 AI 專家團隊。</p>
+                <ul>
+                    <li><strong>多輪討論模式</strong> - AI 團隊會持續進行多輪辯論與對談，直到達成共識。</li>
+                    <li><strong>戰略劇本</strong> - 使用下拉選單載入經典商業場景，快速啟動高品質討論。</li>
+                    <li><strong>動態指令</strong> - 會議進行中，您可以修改描述並點擊 [UPDATE GOAL]，AI 團隊會立刻依照新方向調整。</li>
+                    <li><strong>共識檢核</strong> - 每輪結束後會有一個自動裁判評估討論深度，決定是否續開下輪。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTeam = [];
+        let currentSessionId = null;
+
+        const SCENARIOS = {
+            'crisis': {
+                topic: '應對重大品牌公關危機',
+                context: '背景：公司核心產品被爆出存在安全隱患，社交媒體上負面輿論正在發酵，股價下跌 5%。\n目標：制定緊急公關回應策略，並在 24 小時內控制損害，恢復公眾信任。'
+            },
+            'launch': {
+                topic: 'AI 創新產品上市發布策略',
+                context: '背景：我們開發了一款革命性的個人 AI 助理，準備在下個月 CES 大展上發布。\n目標：設計一套能引爆市場話題的行銷漏斗，目標是在發布首日獲得 10 萬註冊用戶。'
+            },
+            'reform': {
+                topic: '企業組織重組與裁員計畫',
+                context: '背景：由於市場環境惡化，公司營收下滑 20%，必須削減成本並精簡組織結構。\n目標：如何在裁員 15% 的同時，維持核心人才的士氣，並完成向「敏捷開發」模式的轉型？'
+            },
+            'blue_ocean': {
+                topic: '尋找後疫情時代的藍海市場',
+                context: '背景：傳統旅遊業復甦緩慢，但數位遊牧民族 (Digital Nomads) 群體正在快速增長。\n目標：構思一個針對此新興群體的服務生態系，避開紅海競爭。'
+            },
+            'career': {
+                topic: '中年職涯轉型與升遷策略',
+                context: '背景：40 歲中階主管，面臨行業天花板與年輕世代競爭，猶豫是否該跳槽至新興 AI 產業。\n目標：分析轉職風險與機會，並規劃未來 5 年的職涯路徑與個人品牌重塑。'
+            },
+            'manage': {
+                topic: '團隊世代衝突調解與激勵',
+                context: '背景：團隊中資深員工 (Gen X) 與新進員工 (Gen Z) 因工作價值觀不同產生摩擦，導致專案進度落後。\n目標：制定一套能融合不同世代優勢的管理機制，並設計能同時激勵雙方的獎酬制度。'
+            },
+            'negotiate': {
+                topic: '高風險商務談判模擬',
+                context: '背景：即將與關鍵供應商進行年度合約談判，對方暗示將漲價 15%，但我方預算已凍結。\n目標：沙盤推演談判策略，找出雙贏的籌碼交換點，確保成本控制在 5% 漲幅內。'
+            },
+            'learning': {
+                topic: '跨領域技能 30 天速成計畫',
+                context: '背景：非技術背景的行銷人員，急需學會使用 Python 進行數據分析以提升工作效率。\n目標：量身打造一份高強度的 30 天學習課表，包含學習資源、實作專案與檢核點。'
+            },
+            'finance': {
+                topic: '邁向財務自由的資產配置',
+                context: '背景：雙薪家庭，年收入穩定但支出高，希望在 15 年後達成 FIRE (財務獨立，提早退休)。\n目標：檢視目前財務漏洞，並建議適合當前經濟局勢的資產配置組合（股債房幣）。'
+            },
+            'health': {
+                topic: '忙碌專業人士的體能優化',
+                context: '背景：高壓工作者，長期久坐、睡眠不足且體脂過高，沒時間去健身房。\n目標：設計一套「極簡」但高效的飲食與居家訓練方案，目標是 3 個月內體脂降 5%。'
+            },
+            'travel': {
+                topic: '三代同堂的完美家族旅遊',
+                context: '背景：計畫帶 70 歲父母與 5 歲小孩去日本旅遊 7 天，需考量體力落差與飲食偏好。\n目標：規劃一份讓老少盡歡的詳細行程表，包含交通動線、休息點與緊急備案。'
+            }
+        };
+
+        function loadScenario() {
+            const key = document.getElementById('scenarioSelector').value;
+            if (SCENARIOS[key]) {
+                document.getElementById('sessionTopic').value = SCENARIOS[key].topic;
+                document.getElementById('sessionContext').value = SCENARIOS[key].context;
+            }
+        }
+
+        async function init() {
+            await loadTeam();
+            await loadHistory();
+        }
+
+        async function loadTeam() {
+            try {
+                const res = await fetch('/api/team');
+                currentTeam = await res.json();
+                renderTeam();
+            } catch (err) { console.error('Failed to load team', err); }
+        }
+
+        function renderTeam() {
+            const container = document.getElementById('teamContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            currentTeam.forEach((m, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.flex = '1 1 250px';
+                card.style.margin = '0';
+                card.style.borderLeft = `4px solid ${m.color}`;
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong style="color: ${m.color}">${m.name}</strong>
+                        <button onclick="removeMember(${index})" style="background: none; border: none; color: #666; cursor: pointer;">&times;</button>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #aaa; margin-top: 5px;">${m.role}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function addTeamMember() {
+            const name = prompt('AI 專家姓名:');
+            const role = prompt('專家職責/專業領域:');
+            if (!name || !role) return;
+
+            const colors = ['#ff00ff', '#00f2ff', '#00ff00', '#ffcc00', '#ff4444'];
+            currentTeam.push({ id: 'ai-' + Date.now(), name, role, color: colors[currentTeam.length % colors.length] });
+            await saveTeam();
+        }
+
+        async function removeMember(index) {
+            currentTeam.splice(index, 1);
+            await saveTeam();
+        }
+
+        async function saveTeam() {
+            await fetch('/api/team', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ members: currentTeam })
+            });
+            renderTeam();
+        }
+
+        async function startBrainstorm() {
+            const topic = document.getElementById('sessionTopic').value;
+            const context = document.getElementById('sessionContext').value;
+            if (!topic) return alert('請先輸入討論議題');
+
+            currentSessionId = 'session-' + Date.now();
+            const field = document.getElementById('brainstormField');
+            field.innerHTML = '';
+            document.getElementById('summarySection').style.display = 'block';
+            document.getElementById('summaryBox').innerText = '戰略計畫啟動中...';
+            document.getElementById('summarySpinner').style.display = 'block';
+
+            currentTeam.forEach(m => {
+                const box = document.createElement('div');
+                box.id = `box-${m.id}`;
+                box.className = 'card';
+                box.style.border = `1px solid ${m.color}`;
+                box.style.background = 'rgba(0,0,0,0.8)';
+                box.style.display = 'flex';
+                box.style.flexDirection = 'column';
+                box.style.maxHeight = '400px';
+                box.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">
+                        <span class="badge" style="background: ${m.color}; color: #000;">${m.name}</span>
+                        <div id="spinner-${m.id}" class="thinking-spinner" style="display:none;"></div>
+                    </div>
+                    <div id="history-${m.id}" style="font-size: 0.85rem; line-height: 1.6; color: #888; overflow-y: auto;">等待加入對話...</div>
+                `;
+                field.appendChild(box);
+            });
+
+            const btn = document.getElementById('startSessionBtn');
+            const updateBtn = document.getElementById('updateGoalBtn');
+            btn.disabled = true; btn.innerText = "會議動態進行中...";
+            updateBtn.disabled = false; updateBtn.style.background = 'var(--accent-color)'; updateBtn.style.color = 'black';
+
+            const url = `/api/brainstorm-stream?topic=${encodeURIComponent(topic)}&context=${encodeURIComponent(context)}&sessionId=${currentSessionId}`;
+            const eventSource = new EventSource(url);
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'ROUND_START') {
+                    // Pre-show spinners
+                    currentTeam.forEach(m => document.getElementById(`spinner-${m.id}`).style.display = 'block');
+                } else if (data.type === 'THOUGHT' && data.memberId) {
+                    const histDiv = document.getElementById(`history-${data.memberId}`);
+                    const spinner = document.getElementById(`spinner-${data.memberId}`);
+                    const msg = document.createElement('div');
+                    msg.innerHTML = `<span style="color:var(--text-dim); font-size:0.7rem;">[Round ${data.round || ''}]</span><br>${data.message}`;
+                    msg.style.marginBottom = '10px';
+                    msg.style.color = 'white';
+                    msg.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                    msg.style.paddingBottom = '5px';
+                    histDiv.appendChild(msg);
+                    histDiv.scrollTop = histDiv.scrollHeight;
+                    if (spinner) spinner.style.display = 'none';
+                } else if (data.type === 'CONSENSUS') {
+                    document.getElementById('summaryBox').innerText = "【共識檢核】\n" + data.message + "\n\n正在產出全案執行計畫...";
+                } else if (data.type === 'SUMMARY') {
+                    document.getElementById('summaryBox').innerText = data.message;
+                    document.getElementById('summarySpinner').style.display = 'none';
+                } else if (data.type === 'COMPLETE') {
+                    eventSource.close();
+                    btn.disabled = false; btn.innerText = "開啟新議題腦激 [GO]";
+                    updateBtn.disabled = true; updateBtn.style.background = 'rgba(255,255,255,0.1)'; updateBtn.style.color = '#888';
+                    loadHistory();
+                } else if (data.type === 'ERROR') {
+                    eventSource.close();
+                    alert(data.message);
+                    btn.disabled = false;
+                }
+            };
+        }
+
+        async function updateSessionGoal() {
+            const goal = document.getElementById('sessionContext').value;
+            if (!currentSessionId) return;
+            const res = await fetch('/api/brainstorm/goal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId: currentSessionId, goal })
+            });
+            const data = await res.json();
+            if (data.success) {
+                const updateBtn = document.getElementById('updateGoalBtn');
+                const oldText = updateBtn.innerText;
+                updateBtn.innerText = "目標已同步！";
+                setTimeout(() => updateBtn.innerText = oldText, 2000);
+            }
+        }
+
+        // Aliases and UI helpers
+        function triggerTick() { startBrainstorm(); }
+        function switchAsset(val) { console.log('Switching:', val); }
+
+        async function loadHistory() {
+            try {
+                const res = await fetch('/api/experience');
+                const exps = await res.json();
+                const list = document.getElementById('experienceList');
+                if (!list) return;
+                list.innerHTML = '';
+                exps.reverse().slice(0, 10).forEach(e => {
+                    const li = document.createElement('li');
+                    li.className = 'experience-item';
+                    li.innerHTML = `
+                        <div style="display: flex; justify-content: space-between;">
+                            <strong>${e.decision || 'BRAINSTORM'}</strong>
+                            <span style="font-size: 0.7rem; color: #555;">${new Date(e.created_at).toLocaleString()}</span>
+                        </div>
+                        <div class="lesson" style="margin-top: 10px; white-space: pre-wrap;">${e.lesson}</div>
+                    `;
+                    list.appendChild(li);
+                });
+            } catch (err) {}
+        }
+
+        function openGuide() { document.getElementById('guideModal').style.display = "block"; }
+        function closeGuide() { document.getElementById('guideModal').style.display = "none"; }
+
+        init();
+    </script>
+</body>
+</html>

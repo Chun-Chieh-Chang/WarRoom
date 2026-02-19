@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://cdn.jsdelivr.net;">
+    <title>Compound Effect | 複利系統儀表板</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --accent-color: #00f2ff;
+            --accent-purple: #ff00ff;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 標題與導覽 */
+        .header {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 4px;
+            color: var(--accent-color);
+            margin: 0;
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+
+        .guide-btn {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .guide-btn:hover {
+            background: var(--accent-color);
+            color: black;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+
+        .trigger-btn {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-purple));
+            border: none;
+            color: black;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
+            margin-left: 15px;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        }
+
+        .trigger-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.6);
+        }
+
+        .trigger-btn:active { transform: scale(0.95); }
+
+        .trigger-btn:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 儀表板區域 */
+        .dashboard-container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .card-full { grid-column: span 2; }
+
+        h2 {
+            font-size: 1rem;
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+        /* 憲法區域 */
+        .constitution-box {
+            background: rgba(0, 242, 255, 0.03);
+            border: 1px dashed rgba(0, 242, 255, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+
+        .principles-text {
+            color: #d1d1d1;
+            line-height: 1.8;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+        }
+
+        /* 列表與表格 */
+        .experience-list {
+            max-height: 350px;
+            overflow-y: auto;
+            list-style: none;
+            padding: 0;
+        }
+
+        .experience-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s;
+        }
+
+        .experience-item:hover { background: rgba(255,255,255,0.02); }
+
+        .badge {
+            background: var(--accent-color);
+            color: black;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+
+        .lesson {
+            display: block;
+            color: var(--text-dim);
+            margin-top: 8px;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 8px;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+
+        .advice-highlight {
+            color: var(--accent-color);
+            background: rgba(0, 242, 255, 0.05);
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 5px 0;
+            border-left: 2px solid var(--accent-color);
+        }
+
+        .thinking-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(111, 66, 193, 0.2);
+            border-top: 2px solid var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; padding: 12px; color: var(--text-dim); border-bottom: 2px solid rgba(0, 242, 255, 0.2); }
+        td { padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+
+        /* 彈窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: #0f0f0f;
+            margin: 5% auto;
+            padding: 40px;
+            border: 1px solid var(--accent-color);
+            width: 80%;
+            max-width: 800px;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2);
+        }
+
+        .close {
+            color: var(--text-dim);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover { color: white; }
+
+        .guide-body { line-height: 1.8; color: #ccc; }
+        .guide-body h1 { color: var(--accent-color); font-size: 1.8rem; margin-bottom: 25px; }
+        .guide-body h2 { color: var(--accent-color); font-size: 1.3rem; margin-top: 30px; border: none; padding: 0; }
+        .guide-body h3 { color: #eee; font-size: 1.1rem; }
+        .guide-body code { background: rgba(0,242,255,0.1); padding: 2px 5px; border-radius: 3px; color: var(--accent-color); }
+        .guide-body pre { background: #1a1a1a; padding: 15px; border-radius: 10px; overflow-x: auto; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>AI BRAINSTORMING <span style="font-weight: 300; opacity: 0.6;">WAR ROOM</span> <span id="currentSessionTopic" style="font-size: 1rem; color: var(--accent-color); margin-left: 20px;">[等待議題...]</span></h1>
+        <div>
+            <button class="guide-btn" onclick="openGuide()">平台說明 [HELP]</button>
+            <button id="startSessionBtn" class="trigger-btn" onclick="startBrainstorm()">開啟腦力激盪 [GO]</button>
+            <button onclick="location.reload()" style="background: none; border: 1px solid #444; color: #666; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; margin-left: 10px;">強刷新 [RESET UI]</button>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        
+        <!-- 系統指揮中心 (System Command Center) - 第三個視窗 -->
+        <div class="card card-full" style="border: 1px solid var(--accent-color); background: rgba(0, 242, 255, 0.02);">
+            <h2 style="color: var(--accent-color);">系統指揮中心 (System Command Center)</h2>
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; align-items: start;">
+                <div>
+                    <label style="display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">切換會議主題 (Switch Theme)</label>
+                    <select id="assetSwitcher" onchange="switchAsset(this.value)" style="width: 100%; background: #111; border: 1px solid #333; color: white; padding: 10px; border-radius: 5px; cursor: pointer;">
+                        <option value="default">預設主題</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主理人控制台 (Master Console) -->
+        <div class="card card-full" style="border: 1px solid var(--accent-color); background: rgba(0, 242, 255, 0.02);">
+            <h2 style="color: var(--accent-color);">主理人控制台 (Master Console)</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label style="display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">提出議題主題 (Session Topic)</label>
+                    <input type="text" id="sessionTopic" placeholder="例如: 如何在 AI 時代保持個人核心競爭力？" style="width: 100%; background: #000; border: 1px solid var(--accent-color); color: white; padding: 12px; border-radius: 5px; font-size: 1rem;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px;">補充資訊或特定限制 (Context / Constraints)</label>
+                    <textarea id="sessionContext" placeholder="提供背景資訊、現有資源或主席的特定期望..." style="width: 100%; height: 45px; background: #000; border: 1px solid #333; color: white; padding: 10px; border-radius: 5px; resize: none;"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 團隊配置窗 (Team Roster) -->
+        <div class="card card-full">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2>AI 戰略團隊配置 (Team Roster)</h2>
+                <button onclick="addTeamMember()" style="background: var(--accent-purple); color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">+ 新增 AI 成員</button>
+            </div>
+            <div id="teamContainer" style="display: flex; flex-wrap: wrap; gap: 15px;">
+                <!-- Team cards injected here -->
+            </div>
+        </div>
+
+        <!-- 即時動態視窗區 (Dynamic Live Windows) -->
+        <div id="brainstormField" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <!-- AI opinion boxes injected here -->
+        </div>
+
+        <!-- 首席戰略官總結 (Synthesis & Action Plan) -->
+        <div id="summarySection" class="card card-full" style="display: none; border: 2px solid var(--accent-purple); background: rgba(111, 66, 193, 0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--accent-purple); margin: 0;">🎯 首席戰略官：全案整合決議 (Action Plan)</h2>
+                <div id="summarySpinner" class="thinking-spinner"></div>
+            </div>
+            <div id="summaryBox" style="font-size: 1rem; line-height: 1.8; color: #eee; white-space: pre-wrap; padding: 20px; background: #000; border-radius: 10px; border: 1px solid #333;">
+                正在等待團隊初步討論...
+            </div>
+        </div>
+        
+        <!-- 會議紀錄 (Session Logs) -->
+        <div class="card card-full">
+            <h2>歷史會議精華 (Past Session Insights)</h2>
+            <ul id="experienceList" class="experience-list">
+                <!-- Session results injected here -->
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- 指南彈窗 (Help Modal) -->
+    <div id="guideModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGuide()">&times;</span>
+            <div id="guideContent" class="guide-body">
+                <h2>AI 戰略大腦會議室 使用指南</h2>
+                <p>歡迎來到 AI 集體決策平台。在這裡，您是最高主理人（Master），負責設定議題並指導您的 AI 專家團隊。</p>
+                <ul>
+                    <li><strong>步驟 1：配置團隊</strong> - 新增或刪除不同領域的 AI 專家。為他們賦予獨特的角色定位（如：市場分析師、風險控管、心理學家等）。</li>
+                    <li><strong>步驟 2：設定議題</strong> - 在主理人控制台中輸入您想要進行深刻檢討的主題，並提供必要的背景資訊。</li>
+                    <li><strong>步驟 3：啟動腦力激盪</strong> - 點擊 [GO]，觀看各成員在專屬視窗中即時發表深刻見解。</li>
+                    <li><strong>步驟 4：獲取總結</strong> - 首席戰略官將會自動整合所有成員的內容，為您擬定具體的解決方案與行動指南。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTeam = [];
+
+        async function init() {
+            await loadTeam();
+            await loadHistory();
+        }
+
+        async function loadTeam() {
+            try {
+                const res = await fetch('/api/team');
+                currentTeam = await res.json();
+                renderTeam();
+            } catch (err) {
+                console.error('Failed to load team', err);
+            }
+        }
+
+        function renderTeam() {
+            const container = document.getElementById('teamContainer');
+            container.innerHTML = '';
+            currentTeam.forEach((m, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.flex = '1 1 250px';
+                card.style.margin = '0';
+                card.style.borderLeft = `4px solid ${m.color}`;
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong style="color: ${m.color}">${m.name}</strong>
+                        <button onclick="removeMember(${index})" style="background: none; border: none; color: #666; cursor: pointer;">&times;</button>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #aaa; margin-top: 5px;">${m.role}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function addTeamMember() {
+            const name = prompt('AI 專家姓名:');
+            const role = prompt('專家職責/專業領域:');
+            if (!name || !role) return;
+
+            const colors = ['#ff00ff', '#00f2ff', '#00ff00', '#ffcc00', '#ff4444'];
+            const newMember = {
+                id: 'ai-' + Date.now(),
+                name,
+                role,
+                color: colors[currentTeam.length % colors.length]
+            };
+
+            currentTeam.push(newMember);
+            await saveTeam();
+        }
+
+        async function removeMember(index) {
+            currentTeam.splice(index, 1);
+            await saveTeam();
+        }
+
+        async function saveTeam() {
+            await fetch('/api/team', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ members: currentTeam })
+            });
+            renderTeam();
+        }
+
+        async function startBrainstorm() {
+            const topic = document.getElementById('sessionTopic').value;
+            const context = document.getElementById('sessionContext').value;
+            if (!topic) return alert('請先輸入討論議題');
+
+            // Reset UI
+            const field = document.getElementById('brainstormField');
+            field.innerHTML = '';
+            document.getElementById('summarySection').style.display = 'block';
+            document.getElementById('summaryBox').innerText = '正在等待團隊初步討論...';
+            document.getElementById('summarySpinner').style.display = 'block';
+
+            // Create boxes for each member
+            const boxes = {};
+            currentTeam.forEach(m => {
+                const box = document.createElement('div');
+                box.className = 'card';
+                box.style.border = `1px solid ${m.color}`;
+                box.style.background = 'rgba(0,0,0,0.5)';
+                box.innerHTML = `
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <span class="badge" style="background: ${m.color}; color: #000;">${m.name}</span>
+                        <div id="spinner-${m.id}" class="thinking-spinner" style="margin-left: 10px;"></div>
+                    </div>
+                    <div id="content-${m.id}" style="font-size: 0.85rem; line-height: 1.6; color: #888;">思考中...</div>
+                `;
+                field.appendChild(box);
+                boxes[m.id] = box;
+            });
+
+            const btn = document.getElementById('startSessionBtn');
+            btn.disabled = true;
+            btn.innerText = "會議進行中...";
+
+            // Connect SSE
+            const url = `/api/brainstorm-stream?topic=${encodeURIComponent(topic)}&context=${encodeURIComponent(context)}`;
+            const eventSource = new EventSource(url);
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'THOUGHT' && data.memberId) {
+                    const contentDiv = document.getElementById(`content-${data.memberId}`);
+                    const spinner = document.getElementById(`spinner-${data.memberId}`);
+                    contentDiv.innerText = data.message;
+                    contentDiv.style.color = 'white';
+                    if (spinner) spinner.style.display = 'none';
+                } else if (data.type === 'SUMMARY') {
+                    document.getElementById('summaryBox').innerText = data.message;
+                    document.getElementById('summarySpinner').style.display = 'none';
+                } else if (data.type === 'COMPLETE') {
+                    eventSource.close();
+                    btn.disabled = false;
+                    btn.innerText = "開啟腦力激盪 [GO]";
+                    loadHistory();
+                } else if (data.type === 'ERROR') {
+                    eventSource.close();
+                    alert(data.message);
+                    btn.disabled = false;
+                    btn.innerText = "開啟腦力激盪 [GO]";
+                }
+            };
+        }
+
+        async function loadHistory() {
+            try {
+                const res = await fetch('/api/experience');
+                const exps = await res.json();
+                const list = document.getElementById('experienceList');
+                list.innerHTML = '';
+                exps.reverse().slice(0, 10).forEach(e => {
+                    const li = document.createElement('li');
+                    li.className = 'experience-item';
+                    li.innerHTML = `
+                        <div style="display: flex; justify-content: space-between;">
+                            <strong>${e.decision || 'BRAINSTORM'}</strong>
+                            <span style="font-size: 0.7rem; color: #555;">${new Date(e.created_at).toLocaleString()}</span>
+                        </div>
+                        <div class="lesson" style="margin-top: 10px; white-space: pre-wrap;">${e.lesson}</div>
+                    `;
+                    list.appendChild(li);
+                });
+            } catch (err) {}
+        }
+
+        function openGuide() { document.getElementById('guideModal').style.display = "block"; }
+        function closeGuide() { document.getElementById('guideModal').style.display = "none"; }
+
+        init();
+    </script>
+</body>
+</html>
