@@ -10,6 +10,20 @@
 
 ## 日誌分錄
 
+### [2026-02-21] 交互邏輯斷裂與 JS 語法安全修復 (UI Interaction Breakage Fix)
+
+- **問題**：頂部的 [HELP] 與 [RESET] 按鈕點擊無反應，且 UI 交互發生局部失效。
+- **根本原因**：
+  1. **函數命名不匹配**：HTML 中的 `onclick` 調用了 `openHelp()`，但在 `<script>` 中僅定義了 `openFullGuide()`，導致運行時 ReferenceError。
+  2. **JS 語法失誤 (Syntax Error)**：在重構 `switchWorkspace` 函數時，因漏閉合花括號 `}`，導致後續的 `loadSystemStatus` 等函數被錯誤嵌套，引發腳本解析中斷，導致整個頁面的動態功能癱瘓。
+- **矯正措施**：
+  1. **函數對接與別名實作**：補齊 `openHelp()` 與 `resetUI()` 函數定義，並正確對接至核心 UI 控制器。
+  2. **代碼結構校驗**：修正語法嵌套錯誤，並補全必要的 `if (element)` 存在性檢查以提升代碼容錯能力。
+- **確認與預防 (SOP 升級)**：
+  1. **雙向檢核 (Two-way Check)**：修改 HTML 綁定事件時，必須同步檢核 `<script>` 內的對應函數簽名。
+  2. **代碼完整性視圖**：在完成重大修改後，使用 `view_file` 掃描整段 script 區塊的語法對稱性（ braces balance）。
+- **成果**：恢復所有 UI 按鈕的功能性，解決了頁面局部癱瘓的問題。
+
 ### [2026-02-21] 佈局塌陷異常與 DOM 結構修復 (UI Layout Collapse Fix)
 
 - **問題**：UI 介面發生嚴重異常，所有內容被壓縮至螢幕極右側，左側出現巨大黑洞。

@@ -1137,8 +1137,27 @@
         // Visual feedback
         const box = document.getElementById('constitutionBox');
         const list = document.getElementById('experienceList');
-        box.style.opacity = '0.3';
-        list.style.opacity = '0.3';
+        if (box) box.style.opacity = '0.3';
+        if (list) list.style.opacity = '0.3';
+
+        await Promise.all([loadConstitution(), loadHistory()]);
+
+        setTimeout(() => {
+          if (box) box.style.opacity = '1';
+          if (list) list.style.opacity = '1';
+        }, 300);
+
+        updateStatus('🌐', '領域已切換', `目前已進入 [${val}] 決策領域。該領域的歷史紀錄與憲法原則已載入完畢。`, '※ 注意：不同領域的 AI 累積智慧相互獨立。');
+      }
+
+      function openHelp() {
+        openFullGuide();
+      }
+
+      function resetUI() {
+        location.reload();
+      }
+
       async function loadSystemStatus() {
         try {
           const res = await fetch('/api/system/status');
@@ -1165,13 +1184,6 @@
         await loadConstitution();
         await loadHistory();
       };
-        setTimeout(() => {
-          box.style.opacity = '1';
-          list.style.opacity = '1';
-        }, 300);
-
-        updateStatus('🌐', '領域已切換', `目前已進入 [${val}] 決策領域。該領域的歷史紀錄與憲法原則已載入完畢。`, '※ 注意：不同領域的 AI 累積智慧相互獨立。');
-      }
 
       async function loadHistory() {
         try {
