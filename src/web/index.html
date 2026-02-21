@@ -20,14 +20,14 @@
     <style>
       :root {
         --bg-color: #020202;
-        --glass-bg: rgba(15, 15, 15, 0.7);
+        --glass-bg: rgba(15, 15, 15, 0.8);
         --accent-color: #00f2ff;
-        --accent-purple: #bd00ff;
-        --accent-orange: #ff9d00;
-        --text-main: #f5f5f7;
-        --text-dim: #86868b;
-        --card-border: rgba(255, 255, 255, 0.1);
-        --inner-glow: inset 0 0 20px rgba(0, 242, 255, 0.05);
+        --accent-purple: #a855f7; /* Softer, more premium lavender purple */
+        --accent-orange: #fbbf24;
+        --text-main: #f8fafc;
+        --text-dim: #94a3b8;
+        --card-border: rgba(255, 255, 255, 0.08);
+        --inner-glow: inset 0 0 20px rgba(0, 242, 255, 0.03);
         
         /* Layered Shadows for Depth */
         --card-shadow: 
@@ -36,28 +36,28 @@
           0 20px 25px -5px rgba(0, 0, 0, 0.9);
 
         /* Fluid Typography System */
-        --font-tiny: clamp(0.65rem, 0.2vw + 0.6rem, 0.75rem);
-        --font-small: clamp(0.75rem, 0.3vw + 0.7rem, 0.85rem);
-        --font-base: clamp(0.9rem, 0.4vw + 0.8rem, 1rem);
-        --font-h2: clamp(1rem, 0.5vw + 0.9rem, 1.25rem);
-        --font-h1: clamp(1.4rem, 3vw + 1rem, 2.8rem);
+        --font-tiny: clamp(0.7rem, 0.2vw + 0.65rem, 0.8rem);
+        --font-small: clamp(0.8rem, 0.3vw + 0.75rem, 0.9rem);
+        --font-base: clamp(0.9rem, 0.4vw + 0.85rem, 1.05rem);
+        --font-h2: clamp(1.1rem, 0.5vw + 1rem, 1.3rem);
+        --font-h1: clamp(1.6rem, 3vw + 1.2rem, 3rem);
         
         /* Spacing System */
-        --gap-main: clamp(15px, 2vw + 10px, 30px);
+        --gap-main: clamp(15px, 2vw + 15px, 35px);
         --container-pad: clamp(20px, 5vw, 60px);
       }
 
       /* Custom Scrollbar - Premium Minimalist */
-      ::-webkit-scrollbar { width: 5px; height: 5px; }
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
       ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; transition: background 0.3s; }
+      ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
       ::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
 
       body {
         background-color: var(--bg-color);
         background-image: 
-          radial-gradient(circle at 50% -20%, rgba(0, 242, 255, 0.08) 0%, transparent 60%),
-          radial-gradient(circle at -10% 50%, rgba(189, 0, 255, 0.05) 0%, transparent 40%);
+          radial-gradient(circle at 50% -20%, rgba(0, 242, 255, 0.05) 0%, transparent 60%),
+          radial-gradient(circle at -10% 50%, rgba(168, 85, 247, 0.03) 0%, transparent 40%);
         color: var(--text-main);
         font-family: 'Inter', 'Noto Sans TC', sans-serif;
         margin: 0;
@@ -71,7 +71,7 @@
 
       .header {
         width: 100%;
-        max-width: 1200px;
+        max-width: 1240px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -80,7 +80,7 @@
 
       h1 {
         font-family: 'Orbitron', sans-serif;
-        letter-spacing: -1px; /* Modern tight tracking */
+        letter-spacing: -1px;
         color: var(--text-main);
         background: linear-gradient(to right, #fff, var(--accent-color));
         background-clip: text;
@@ -89,35 +89,38 @@
         margin: 0;
         font-size: var(--font-h1);
         font-weight: 700;
+        filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.2));
       }
 
       .card {
         background: var(--glass-bg);
-        backdrop-filter: blur(25px) saturate(180%);
+        backdrop-filter: blur(30px) saturate(180%);
         border: 1px solid var(--card-border);
-        border-radius: 24px;
+        border-radius: 28px;
         padding: var(--gap-main);
         box-shadow: var(--card-shadow);
         box-sizing: border-box;
-        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
+        min-width: 0;
       }
       
       .card::before {
         content: '';
         position: absolute;
         top: 0; left: 0; right: 0; height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
       }
 
       .card:hover {
-        border-color: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
       }
 
       /* Active AI Pulse Animation */
       @keyframes pulse-cyan {
-        0% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.2); }
+        0% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.15); }
         70% { box-shadow: 0 0 0 15px rgba(0, 242, 255, 0); }
         100% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0); }
       }
@@ -128,38 +131,52 @@
       }
 
       .card-accent {
-        border: 1px solid rgba(0, 242, 255, 0.3) !important;
-        box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.03), var(--card-shadow);
+        border: 1px solid rgba(0, 242, 255, 0.2) !important;
+        box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.02), var(--card-shadow);
       }
 
       .card-purple {
-        border: 1px solid rgba(189, 0, 255, 0.3) !important;
-        box-shadow: inset 0 0 30px rgba(189, 0, 255, 0.03), var(--card-shadow);
+        border: 1px solid rgba(168, 85, 247, 0.2) !important;
+        box-shadow: inset 0 0 30px rgba(168, 85, 247, 0.02), var(--card-shadow);
       }
 
       input, textarea, select {
-        background: rgba(0,0,0,0.5);
-        border: 1px solid rgba(255,255,255,0.1);
-        color: #fff;
-        padding: 14px;
-        border-radius: 12px;
+        background: rgba(13, 13, 13, 0.8);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: var(--text-main);
+        padding: 14px 18px;
+        border-radius: 14px;
         font-size: var(--font-small);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s ease;
+        outline: none;
+      }
+
+      optgroup {
+        background: #111;
+        color: var(--accent-purple);
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      option {
+        background: #0a0a0a;
+        color: var(--text-main);
+        padding: 10px;
       }
 
       input:focus, textarea:focus, select:focus {
-        background: rgba(0, 0, 0, 0.8);
+        background: #000;
         border-color: var(--accent-color);
-        box-shadow: 0 0 0 4px rgba(0, 242, 255, 0.1);
+        box-shadow: 0 0 0 4px rgba(0, 242, 255, 0.08);
       }
 
       .label-text {
         display: block;
         font-size: var(--font-tiny);
         color: var(--text-dim);
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 1.2px;
         font-weight: 600;
       }
 
@@ -179,24 +196,29 @@
       h2::before {
         content: '';
         display: inline-block;
-        width: 4px;
-        height: 18px;
+        width: 3px;
+        height: 16px;
         background: var(--accent-color);
         border-radius: 2px;
       }
 
       .dashboard-container {
         width: 100%;
-        max-width: 1200px;
+        max-width: 1240px;
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: var(--gap-main);
-        margin: 0 auto;
+        margin: 20px auto;
         box-sizing: border-box;
+        align-items: start;
       }
 
       .card-full { grid-column: span 2; }
-      .grid-half { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+      .grid-half { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+        gap: 35px; 
+      }
 
       .guide-btn {
         background: rgba(255, 255, 255, 0.03);
@@ -480,7 +502,7 @@
         </div>
         <div
           id="constitutionBox"
-          style="font-size: var(--font-small); line-height: 1.6; color: #ccc; min-height: 80px; white-space: pre-line;"
+          style="font-size: var(--font-small); line-height: 1.6; color: var(--text-main); min-height: 80px; white-space: pre-line;"
         >
           尚未進行智慧提煉...
         </div>
@@ -490,11 +512,11 @@
           style="
             margin-top: 15px;
             width: 100%;
-            background: rgba(111, 66, 193, 0.1);
+            background: rgba(168, 85, 247, 0.1);
             border: 1px solid var(--accent-purple);
-            color: var(--accent-purple);
-            padding: 10px;
-            border-radius: 5px;
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: var(--font-small);
             font-family: 'Orbitron', sans-serif;
@@ -507,58 +529,64 @@
 
       <!-- 主理人控制台 (Master Console) -->
       <div class="card card-accent card-full">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
           <h2 style="color: var(--accent-color); margin: 0">主理人控制台 (Master Console)</h2>
-          <select id="scenarioSelector" onchange="loadScenario()" style="border-color: var(--accent-purple); color: var(--accent-purple);">
-            <option value="">📂 載入戰略劇本 (Load Playbook)...</option>
-            <optgroup label="💼 商業與職場 (Business & Career)">
-              <option value="crisis">🔥 【危機公關】品牌聲譽修復</option>
-              <option value="launch">🚀 【產品發布】AI 新產品上市</option>
-              <option value="reform">⚔️ 【組織變革】企業轉型與裁員</option>
-              <option value="blue_ocean">🌊 【藍海策略】尋找未開發市場</option>
-              <option value="manage">🤝 【團隊管理】衝突調解與激勵</option>
-              <option value="career">🎓 【職涯發展】中年轉職與升遷</option>
-              <option value="negotiate">🎙️ 【溝通談判】高風險商務談判</option>
-            </optgroup>
-            <optgroup label="🌱 生活與成長 (Life & Self-Growth)">
-              <option value="learning">🧠 【學習成長】跨領域技能速成</option>
-              <option value="finance">💰 【財務自由】退休資產配置</option>
-              <option value="health">💪 【健康生活】減重與體能優化</option>
-              <option value="travel">✈️ 【家庭旅遊】複雜行程規劃</option>
-            </optgroup>
-            <optgroup label="🛡️ 品質管理專欄 (Quality & Service)">
-              <option value="complaint">🚩 【客訴解決】高風險品質爭議處理</option>
-              <option value="quality_opt">🛠️ 【系統優化】品質管控體系全面提升</option>
-            </optgroup>
-          </select>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="scenarioSelector" onchange="loadScenario()" style="border-color: var(--accent-purple); color: var(--text-main); height: 45px;">
+              <option value="">📂 載入戰略劇本 (Load Playbook)...</option>
+              <optgroup label="💼 商業與職場 (Business & Career)">
+                <option value="crisis">🔥 【危機公關】品牌聲譽修復</option>
+                <option value="launch">🚀 【產品發布】AI 新產品上市</option>
+                <option value="reform">⚔️ 【組織變革】企業轉型與裁員</option>
+                <option value="blue_ocean">🌊 【藍海策略】尋找未開發市場</option>
+                <option value="manage">🤝 【團隊管理】衝突調解與激勵</option>
+                <option value="career">🎓 【職涯發展】中年轉職與升遷</option>
+                <option value="negotiate">🎙️ 【溝通談判】高風險商務談判</option>
+              </optgroup>
+              <optgroup label="🌱 生活與成長 (Life & Self-Growth)">
+                <option value="learning">🧠 【學習成長】跨領域技能速成</option>
+                <option value="finance">💰 【財務自由】退休資產配置</option>
+                <option value="health">💪 【健康生活】減重與體能優化</option>
+                <option value="travel">✈️ 【家庭旅遊】複雜行程規劃</option>
+              </optgroup>
+              <optgroup label="🛡️ 品質管理專欄 (Quality & Service)">
+                <option value="complaint">🚩 【客訴解決】高風險品質爭議處理</option>
+                <option value="quality_opt">🛠️ 【系統優化】品質管控體系全面提升</option>
+              </optgroup>
+            </select>
+            <button id="startSessionBtn" class="trigger-btn" onclick="startBrainstorm()">
+              開啟腦力激盪 [GO]
+            </button>
+          </div>
         </div>
 
         <div class="grid-half">
           <div>
             <label class="label-text">針對議題目標 (Session Goal / Directive)</label>
-            <input type="text" id="sessionTopic" placeholder="議題主題，例如: 品牌轉型策略" style="width: 100%; margin-bottom: 15px; border-color: var(--accent-color);">
-            <textarea id="sessionContext" placeholder="討論目標或補充背景... (會議中可隨時修改並按更新)" style="width: 100%; height: 80px;"></textarea>
+            <input type="text" id="sessionTopic" placeholder="議題主題，例如: 品牌轉型策略" style="width: 100%; margin-bottom: 12px; border-color: var(--accent-color);">
+            <textarea id="sessionContext" placeholder="討論目標或補充背景... (隨時修改並按下方更新)" style="width: 100%; height: 100px;"></textarea>
           </div>
-          <div style="display: flex; flex-direction: column; justify-content: flex-end; gap: 10px">
+          <div style="display: flex; flex-direction: column; justify-content: flex-start; gap: 15px; padding-top: 25px;">
             <button
               id="updateGoalBtn"
               onclick="updateSessionGoal()"
               disabled
               style="
-                background: rgba(255, 255, 255, 0.05);
-                color: #555;
+                background: rgba(255, 255, 255, 0.03);
+                color: var(--text-dim);
                 border: 1px solid #222;
-                padding: 12px;
-                border-radius: 5px;
+                padding: 15px;
+                border-radius: 8px;
                 cursor: pointer;
                 font-size: var(--font-small);
                 transition: all 0.3s;
+                font-family: 'Orbitron', sans-serif;
               "
             >
-              隨時更新目標 [UPDATE GOAL]
+              更新當前議題 [UPDATE GOAL]
             </button>
-            <div style="font-size: var(--font-tiny); color: #444">
-              * 會議進行中修改上方描述後按 [UPDATE] 可即時改變 AI 討論方向
+            <div style="font-size: var(--font-tiny); color: var(--text-dim); line-height: 1.5; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border-left: 3px solid var(--accent-color);">
+              ※ 指令導引：會議中修改左側描述後按上方按鈕，即時改變 AI 專家的對策方向。
             </div>
           </div>
         </div>
