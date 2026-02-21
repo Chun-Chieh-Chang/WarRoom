@@ -9,11 +9,12 @@ export interface TeamMember {
 }
 
 export interface BrainstormProgress { 
-  type: 'ROUND_START' | 'THOUGHT' | 'SUMMARY' | 'COMPLETE' | 'ERROR' | 'CONSENSUS'; 
+  type: 'ROUND_START' | 'THOUGHT' | 'SUMMARY' | 'COMPLETE' | 'ERROR' | 'CONSENSUS' | 'PROGRESS'; 
   memberId?: string; 
   message: string; 
   memberName?: string;
   round?: number;
+  progress?: number; // 0-100
 }
 
 export type BrainstormProgressCallback = (data: BrainstormProgress) => void;
@@ -29,7 +30,9 @@ export class BrainstormingController {
     initialGoal: string, 
     members: TeamMember[], 
     onProgress: BrainstormProgressCallback,
-    getCurrentGoal: () => string // Support mid-session goal updates
+    getCurrentGoal: () => string,
+    analysisMode: string = 'default',
+    assetId: string = 'default'
   ): Promise<void> {
     try {
       const history: { memberName: string, role: string, content: string }[] = [];
@@ -43,23 +46,40 @@ export class BrainstormingController {
         const currentGoal = getCurrentGoal() || initialGoal;
         onProgress({ type: 'ROUND_START', message: `第 ${round} 輪討論開始...`, round });
 
-        for (const member of members) {
+        const totalSteps = MAX_ROUNDS * members.length;
+        
+        for (let i = 0; i < members.length; i++) {
+          const member = members[i];
+          // Calculate overall progress: (current round - 1) * members + current member index
+          const progressValue = Math.round(((round - 1) * members.length + i) / totalSteps * 90);
+          onProgress({ type: 'PROGRESS', message: `進度: ${progressValue}%`, progress: progressValue });
+
+          let modeInstruction = "";
+          if (analysisMode === 'swot') {
+            modeInstruction = "請優先使用 [優勢]、[劣勢]、[機會]、[威脅] 標籤來分析當前議題。";
+          } else if (analysisMode === 'pestel') {
+            modeInstruction = "請從 [政治]、[經濟]、[社會]、[技術]、[環境]、[法律] 等維度切入。";
+          } else if (analysisMode === 'antifragile') {
+            modeInstruction = "請專注於尋找「黑天鵝」風險，評估方案的「抗脆弱性」，找出最壞情況下的存續機制。";
+          }
+
           const prompt = `
             你現在是 AI 團隊中的「${member.name}」。你的專業角色是「${member.role}」。
             ---
             議題：${topic}
             當前階段目標：${currentGoal}
+            分析模式需求：${modeInstruction}
             ---
             對話歷史：
             ${history.map(h => `[${h.memberName} (${h.role})]: ${h.content}`).join('\n')}
             ---
             請根據你的專業視角對上述討論進行回應。你可以：
-            1. 提出新見解。
+            1. 提出新見解或分析。
             2. 補充或質疑其他成員的觀點 (請扮演魔鬼代言人，不要輕易同意)。
             3. 向達成「${currentGoal}」的方向推進。
             
             [語言憲法] 嚴格使用繁體中文，禁止簡體字。
-            請保持回覆精簡且具備挑戰性（約 80 字以內）。
+            請保持回覆精簡且具備挑戰性（約 100 字以內）。
             不要重複自己已說過的話。除非方案完美無缺，否則請嘗試找出潛在風險或執行漏洞。
           `;
 
@@ -99,15 +119,19 @@ export class BrainstormingController {
         `;
 
         const checkRes = await this.ai.generate(checkPrompt);
+        const checkContent = checkRes.content.trim();
         
+        // Robustness: Use regex to find "已收斂" or "consensus reached" anywhere in output
+        const isConsensusReached = /已收斂|consensus reached/i.test(checkContent);
+
         // Enforce minimum rounds
         if (round < MIN_ROUNDS) {
-             onProgress({ type: 'THOUGHT', message: `討論尚未深入 (未達最小輪數)，強制進入下一輪。` });
-        } else if (checkRes.content.includes('已收斂')) {
+             onProgress({ type: 'THOUGHT', message: `討論尚未深入 (未達最小輪數要求)，強制進入下一輪。` });
+        } else if (isConsensusReached) {
           isSettled = true;
-          onProgress({ type: 'CONSENSUS', message: checkRes.content.trim() });
+          onProgress({ type: 'CONSENSUS', message: checkContent });
         } else {
-          onProgress({ type: 'THOUGHT', message: `討論尚未收斂，進入下一輪。` });
+          onProgress({ type: 'THOUGHT', message: `第 ${round} 輪討論尚未收斂，進入下一輪分析。` });
         }
       }
 
@@ -115,9 +139,9 @@ export class BrainstormingController {
       const summaryMode = isSettled ? 'CONSENSUS_REACHED' : 'CONFLICT_RESOLUTION';
       
       if (summaryMode === 'CONFLICT_RESOLUTION') {
-        onProgress({ type: 'THOUGHT', message: `注意：團隊未達成完全共識。正在召集「首席戰略官」進行關鍵裁決...` });
+        onProgress({ type: 'THOUGHT', message: `注意：團隊未能在 5 輪內達成完全共識。正在召集「首席戰略官」進行指令性決策裁決...` });
       } else {
-        onProgress({ type: 'THOUGHT', message: `正在召集「首席戰略官」進行全案大成...` });
+        onProgress({ type: 'THOUGHT', message: `正在召集「首席戰略官」進行全案大成與戰略總結...` });
       }
 
       const summaryPrompt = isSettled ? `
@@ -158,7 +182,8 @@ export class BrainstormingController {
         { topic, goal: getCurrentGoal(), rounds: history.length, settled: isSettled },
         `【${isSettled ? '共識達成' : '裁決指令'}】${topic}`,
         summaryRes.content, // This will be the 'lesson' displayed in the list
-        { members: members.map(m => m.name) }
+        { members: members.map(m => m.name) },
+        assetId
       );
       
       // Auto-archive to Markdown
@@ -212,6 +237,6 @@ ${summaryRes.content}
 
   // Legacy fallback
   async executeSession(topic: string, context: string, members: TeamMember[], onProgress: BrainstormProgressCallback): Promise<void> {
-    return this.executeMultiRoundSession(topic, context, members, onProgress, () => context);
+    return this.executeMultiRoundSession(topic, context, members, onProgress, () => context, 'default');
   }
 }

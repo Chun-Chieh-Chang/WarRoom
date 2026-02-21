@@ -35,6 +35,7 @@ export class SqliteStore {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS experience (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        asset_id TEXT DEFAULT 'default',
         context_state TEXT NOT NULL,
         decision TEXT NOT NULL,
         outcome_metrics TEXT,
@@ -60,11 +61,37 @@ export class SqliteStore {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS constitution (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        asset_id TEXT DEFAULT 'default',
         principles TEXT NOT NULL,
         version INTEGER NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Add indexes for performance
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_experience_asset_id ON experience(asset_id)`);
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_experience_created_at ON experience(created_at)`);
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_actions_asset_id ON actions(asset_id)`);
+    this.db.exec(
+      `CREATE INDEX IF NOT EXISTS idx_actions_timestamp ON actions(timestamp)`
+    );
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_constitution_asset_id ON constitution(asset_id)`);
+    this.db.exec(
+      `CREATE INDEX IF NOT EXISTS idx_constitution_version ON constitution(version)`
+    );
+    this.db.exec(`CREATE INDEX IF NOT EXISTS idx_assets_type ON assets(type)`);
+
+    // Migration: Check and add asset_id if missing (for existing databases)
+    const tablesToMigrate = ['experience', 'constitution'];
+    for (const table of tablesToMigrate) {
+      const info = this.db.pragma(`table_info(${table})`) as any[];
+      const hasAssetId = info.some(col => col.name === 'asset_id');
+      if (!hasAssetId) {
+        console.log(`[Migration] Adding asset_id to ${table} table...`);
+        this.db.exec(`ALTER TABLE ${table} ADD COLUMN asset_id TEXT DEFAULT 'default'`);
+        this.db.exec(`CREATE INDEX IF NOT EXISTS idx_${table}_asset_id ON ${table}(asset_id)`);
+      }
+    }
   }
 
   /**
@@ -101,20 +128,20 @@ export class SqliteStore {
   /**
    * Saves an AI experience/lesson.
    */
-  saveExperience(context: any, decision: string, lesson: string, metrics: any = {}): void {
+  saveExperience(context: any, decision: string, lesson: string, metrics: any = {}, assetId: string = 'default'): void {
     const stmt = this.db.prepare(`
-      INSERT INTO experience (context_state, decision, lesson, outcome_metrics)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO experience (context_state, decision, lesson, outcome_metrics, asset_id)
+      VALUES (?, ?, ?, ?, ?)
     `);
-    stmt.run(JSON.stringify(context), decision, lesson, JSON.stringify(metrics));
+    stmt.run(JSON.stringify(context), decision, lesson, JSON.stringify(metrics), assetId);
   }
 
   /**
    * Retrieves recent experiences to provide as context for AI.
    */
-  getRecentExperiences(limit: number = 5): any[] {
-    const stmt = this.db.prepare('SELECT * FROM experience ORDER BY created_at DESC LIMIT ?');
-    return stmt.all(limit).map((row: any) => ({
+  getRecentExperiences(limit: number = 5, assetId: string = 'default'): any[] {
+    const stmt = this.db.prepare('SELECT * FROM experience WHERE asset_id = ? ORDER BY created_at DESC LIMIT ?');
+    return stmt.all(assetId, limit).map((row: any) => ({
       ...row,
       context_state: JSON.parse(row.context_state),
       outcome_metrics: JSON.parse(row.outcome_metrics)
@@ -135,20 +162,20 @@ export class SqliteStore {
   /**
    * Updates the system constitution with new principles.
    */
-  updateConstitution(principles: string, version: number): void {
+  updateConstitution(principles: string, version: number, assetId: string = 'default'): void {
     const stmt = this.db.prepare(`
-      INSERT INTO constitution (principles, version)
-      VALUES (?, ?)
+      INSERT INTO constitution (principles, version, asset_id)
+      VALUES (?, ?, ?)
     `);
-    stmt.run(principles, version);
+    stmt.run(principles, version, assetId);
   }
 
   /**
    * Gets the latest set of distilled principles.
    */
-  getLatestConstitution(): { principles: string, version: number } | null {
-    const stmt = this.db.prepare('SELECT principles, version FROM constitution ORDER BY version DESC LIMIT 1');
-    return (stmt.get() as any) || null;
+  getLatestConstitution(assetId: string = 'default'): { principles: string, version: number } | null {
+    const stmt = this.db.prepare('SELECT principles, version FROM constitution WHERE asset_id = ? ORDER BY version DESC LIMIT 1');
+    return (stmt.get(assetId) as any) || null;
   }
 
   /**
@@ -183,6 +210,21 @@ export class SqliteStore {
   clearActions(): void {
     this.db.prepare('DELETE FROM actions').run();
     this.db.prepare('DELETE FROM experience').run();
+  }
+
+  /**
+   * Saves a generic system setting.
+   */
+  saveSetting(key: string, data: any): void {
+    this.save(key, 'SYSTEM_SETTING', data, 1);
+  }
+
+  /**
+   * Retrieves a generic system setting.
+   */
+  getSetting(key: string): any | null {
+    const asset = this.load(key);
+    return asset ? asset.data : null;
   }
 
   close() {

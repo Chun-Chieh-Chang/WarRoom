@@ -15,16 +15,17 @@ export class DistillationManager {
   /**
    * Distills the last X experiences into a new version of the System Constitution.
    */
-  async distill(): Promise<void> {
-    console.log('[Distill] Starting Meta-Knowledge Distillation...');
+  async distill(assetId: string = 'default'): Promise<void> {
+    console.log(`[Distill][${assetId}] Starting Meta-Knowledge Distillation...`);
 
     // 1. Fetch raw data
-    const experiences = this.store.getRecentExperiences(20);
-    const existingConstitution = this.store.getLatestConstitution();
+    const experiences = this.store.getRecentExperiences(20, assetId);
+    const existingConstitution = this.store.getLatestConstitution(assetId);
 
     if (experiences.length < 5) {
-      console.log('[Distill] Not enough experiences to distill yet (minimum 5).');
-      return;
+      const errorMsg = `[Distill] Not enough experiences to distill for workspace [${assetId}] yet (minimum 5).`;
+      console.log(errorMsg);
+      throw new Error(errorMsg);
     }
 
     // 2. Format for AI
@@ -49,14 +50,25 @@ export class DistillationManager {
 
     const distillationRole = "You are the 'Great Architect'. Your job is to extract fundamental wisdom from raw data. [語言憲法] 你必須嚴格使用繁體中文，禁止使用任何簡體字。";
     
-    console.log('[Distill] AI is synthesizing wisdom...');
-    const response = await this.ai.generate(prompt, '', distillationRole);
-    
-    // 4. Update the Constitution
-    const nextVersion = (existingConstitution?.version || 0) + 1;
-    this.store.updateConstitution(response.content.trim(), nextVersion);
-    
-    console.log(`[Distill] System Constitution Evolved to Version ${nextVersion}!`);
-    console.log(`[Wisdom] New Principles:\n${response.content.trim()}`);
+    console.log(`[Distill] AI is synthesizing wisdom...`);
+    try {
+      const response = await this.ai.generate(prompt, '', distillationRole);
+      const newPrinciples = response.content.trim();
+
+      // Robustness Check: Ensure response is not empty and has a minimum quality
+      if (!newPrinciples || newPrinciples.length < 10) {
+        throw new Error('AI returned insufficient or empty principles.');
+      }
+
+      // 4. Update the Constitution
+      const nextVersion = (existingConstitution?.version || 0) + 1;
+      this.store.updateConstitution(newPrinciples, nextVersion, assetId);
+      
+      console.log(`[Distill] System Constitution Evolved to Version ${nextVersion}!`);
+    } catch (error: any) {
+      console.error(`[Distill] Failed to evolve constitution for [${assetId}]:`, error.message);
+      // Fallback: Re-save existing to bump timestamp or just log failure
+      // This prevents the system from crashing if AI service is down
+    }
   }
 }

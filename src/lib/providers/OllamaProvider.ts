@@ -8,9 +8,24 @@ import { AIProvider, AIResponse } from '../AIProvider';
 export class OllamaProvider implements AIProvider {
   constructor(
     private endpoint: string = 'http://127.0.0.1:11434',
-    private model: string = 'qwen3-coder:480b-cloud',
+    private model: string = 'deepseek-r1:32b',
     private systemPrompt: string = 'You are an autonomous growth agent in a Compound Effect system. Your goal is to optimize asset accumulation and knowledge building. [語言憲法] 你必須嚴格使用「繁體中文」（Traditional Chinese）回答所有問題，絕對禁止使用簡體字。若輸入內容包含簡體，請在回覆時自動將其轉換為繁體。'
   ) {}
+
+  /**
+   * Dynamically switch the model
+   */
+  setModel(newModel: string) {
+    console.log(`[AI Provider] Switching model to: ${newModel}`);
+    this.model = newModel;
+  }
+
+  /**
+   * Get the active model name
+   */
+  getModel(): string {
+    return this.model;
+  }
 
   async generate(prompt: string, context: string = '', overrideSystemPrompt?: string): Promise<AIResponse> {
     try {

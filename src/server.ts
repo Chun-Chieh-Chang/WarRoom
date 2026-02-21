@@ -6,11 +6,19 @@ import path from 'path';
 
 import { FlywheelController } from './FlywheelController';
 import { OllamaProvider } from './lib/providers/OllamaProvider';
+import { DistillationManager } from './core/DistillationManager';
+import { HardwareDetector } from './lib/HardwareDetector';
 
 const app = express();
 const port = 3000;
 const store = new SqliteStore('./data/system.db');
 const ai = new OllamaProvider();
+const distillation = new DistillationManager(store, ai);
+
+// Auto-detect optimal hardware settings
+const hwConfig = HardwareDetector.getOptimalModel(ai.getModel());
+ai.setModel(hwConfig.model);
+console.log(`[Startup] ${hwConfig.reason}`);
 
 app.use(cors());
 app.use(express.json());
@@ -24,11 +32,13 @@ app.use((req, res, next) => {
 import { BrainstormingController, TeamMember } from './BrainstormingController';
 
 // Default AI Team Configuration
-let currentTeam: TeamMember[] = [
-  { id: 'ai-mold', name: '模具工程部主管', role: '負責模具設計審查、開模可行性評估與技術問題解決', color: '#ff9900' }, // Orange
-  { id: 'ai-qa', name: '品保部主管', role: '專注於風險管控、品質標準、良率控制與客訴預防', color: '#00ccff' }, // Light Blue
-  { id: 'ai-sales', name: '業務部主管', role: '負責客戶需求釐清、訂單交期協調與市場反饋', color: '#66ff66' }  // Light Green
+const DEFAULT_TEAM: TeamMember[] = [
+  { id: 'ai-mold', name: '模具工程部主管', role: '負責模具設計審查、開模可行性評估與技術問題解決', color: '#ff9900' }, 
+  { id: 'ai-qa', name: '品保部主管', role: '專注於風險管控、品質標準、良率控制與客訴預防', color: '#00ccff' }, 
+  { id: 'ai-sales', name: '業務部主管', role: '負責客戶需求釐清、訂單交期協調與市場反饋', color: '#66ff66' } 
 ];
+
+let currentTeam: TeamMember[] = store.getSetting('system_team') || DEFAULT_TEAM;
 
 /**
  * API: Get Current Team
@@ -44,7 +54,8 @@ app.post('/api/team', (req, res) => {
   const { members } = req.body;
   if (Array.isArray(members)) {
     currentTeam = members;
-    res.json({ success: true, message: '團隊成員已更新' });
+    store.saveSetting('system_team', members); // Persistent Save
+    res.json({ success: true, message: '團隊成員已更新並永久存檔' });
   } else {
     res.status(400).json({ error: '無效的成員清單' });
   }
@@ -72,6 +83,8 @@ app.get('/api/brainstorm-stream', async (req, res) => {
   const topic = req.query.topic as string || '如何提升複利系統的用戶參與度？';
   const goal = req.query.context as string || '';
   const sessionId = req.query.sessionId as string || 'default';
+  const analysisMode = req.query.analysisMode as string || 'default';
+  const assetId = req.query.assetId as string || 'default';
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -89,7 +102,9 @@ app.get('/api/brainstorm-stream', async (req, res) => {
       goal, 
       currentTeam, 
       (progress) => send(progress),
-      () => activeSessions.get(sessionId)?.currentGoal || goal
+      () => activeSessions.get(sessionId)?.currentGoal || goal,
+      analysisMode,
+      assetId
     );
     activeSessions.delete(sessionId);
     res.end();
@@ -209,8 +224,9 @@ app.get('/api/assets', (req, res) => {
  * API: Get experience logs
  */
 app.get('/api/experience', (req, res) => {
+  const assetId = req.query.assetId as string || 'default';
   try {
-    const experiences = store.getRecentExperiences(10);
+    const experiences = store.getRecentExperiences(10, assetId);
     res.json(experiences);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch experiences' });
@@ -233,11 +249,27 @@ app.get('/api/actions', (req, res) => {
  * API: Get latest system constitution
  */
 app.get('/api/constitution', (req, res) => {
+  const assetId = req.query.assetId as string || 'default';
   try {
-    const constitution = store.getLatestConstitution();
+    const constitution = store.getLatestConstitution(assetId);
     res.json(constitution || { principles: '尚未進行智慧提煉', version: 0 });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch constitution' });
+  }
+});
+
+/**
+ * API: Manually trigger distillation
+ */
+app.post('/api/distill', async (req, res) => {
+  const { assetId } = req.body;
+  const targetId = assetId || 'default';
+  try {
+    await distillation.distill(targetId);
+    const constitution = store.getLatestConstitution(targetId);
+    res.json({ success: true, constitution });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -256,6 +288,17 @@ app.get('/api/guide', (req, res) => {
 
 // Serve static files AFTER API routes
 app.use(express.static(path.join(__dirname, 'web')));
+
+/**
+ * API: Get System/Hardware Status
+ */
+app.get('/api/system/status', (req, res) => {
+  res.json({
+    ...hwConfig,
+    activeModel: hwConfig.model,
+    endpoint: 'http://127.0.0.1:11434'
+  });
+});
 
 app.listen(port, () => {
   console.log(`--- Compound Effect Dashboard Server ---`);
