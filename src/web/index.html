@@ -28,11 +28,10 @@
         --text-dim: #94a3b8;
         --card-border: rgba(255, 255, 255, 0.08);
         --inner-glow: inset 0 0 20px rgba(0, 242, 255, 0.03);
-        
+
         /* Layered Shadows for Depth */
-        --card-shadow: 
-          0 4px 6px -1px rgba(0, 0, 0, 0.5),
-          0 10px 15px -3px rgba(0, 0, 0, 0.8),
+        --card-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 10px 15px -3px rgba(0, 0, 0, 0.8),
           0 20px 25px -5px rgba(0, 0, 0, 0.9);
 
         /* Fluid Typography System */
@@ -41,21 +40,31 @@
         --font-base: clamp(0.9rem, 0.4vw + 0.85rem, 1.05rem);
         --font-h2: clamp(1.1rem, 0.5vw + 1rem, 1.3rem);
         --font-h1: clamp(1.6rem, 3vw + 1.2rem, 3rem);
-        
+
         /* Spacing System */
         --gap-main: clamp(15px, 2vw + 15px, 35px);
         --container-pad: clamp(20px, 5vw, 60px);
       }
 
       /* Custom Scrollbar - Premium Minimalist */
-      ::-webkit-scrollbar { width: 6px; height: 6px; }
-      ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
-      ::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-color);
+      }
 
       body {
         background-color: var(--bg-color);
-        background-image: 
+        background-image:
           radial-gradient(circle at 50% -20%, rgba(0, 242, 255, 0.05) 0%, transparent 60%),
           radial-gradient(circle at -10% 50%, rgba(168, 85, 247, 0.03) 0%, transparent 40%);
         color: var(--text-main);
@@ -105,12 +114,15 @@
         overflow: visible;
         min-width: 0;
       }
-      
+
       .card::before {
         content: '';
         position: absolute;
-        top: 0; left: 0; right: 0; height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
       }
 
       .card:hover {
@@ -120,11 +132,17 @@
 
       /* Active AI Pulse Animation */
       @keyframes pulse-cyan {
-        0% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.15); }
-        70% { box-shadow: 0 0 0 15px rgba(0, 242, 255, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0); }
+        0% {
+          box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.15);
+        }
+        70% {
+          box-shadow: 0 0 0 15px rgba(0, 242, 255, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(0, 242, 255, 0);
+        }
       }
-      
+
       .thinking-active {
         animation: pulse-cyan 2s infinite;
         border-color: var(--accent-color) !important;
@@ -132,17 +150,23 @@
 
       .card-accent {
         border: 1px solid rgba(0, 242, 255, 0.2) !important;
-        box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.02), var(--card-shadow);
+        box-shadow:
+          inset 0 0 30px rgba(0, 242, 255, 0.02),
+          var(--card-shadow);
       }
 
       .card-purple {
         border: 1px solid rgba(168, 85, 247, 0.2) !important;
-        box-shadow: inset 0 0 30px rgba(168, 85, 247, 0.02), var(--card-shadow);
+        box-shadow:
+          inset 0 0 30px rgba(168, 85, 247, 0.02),
+          var(--card-shadow);
       }
 
-      input, textarea, select {
+      input,
+      textarea,
+      select {
         background: rgba(13, 13, 13, 0.8);
-        border: 1px solid rgba(255,255,255,0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         color: var(--text-main);
         padding: 14px 18px;
         border-radius: 14px;
@@ -164,7 +188,9 @@
         padding: 10px;
       }
 
-      input:focus, textarea:focus, select:focus {
+      input:focus,
+      textarea:focus,
+      select:focus {
         background: #000;
         border-color: var(--accent-color);
         box-shadow: 0 0 0 4px rgba(0, 242, 255, 0.08);
@@ -192,7 +218,7 @@
         align-items: center;
         gap: 12px;
       }
-      
+
       h2::before {
         content: '';
         display: inline-block;
@@ -213,11 +239,13 @@
         align-items: start;
       }
 
-      .card-full { grid-column: span 2; }
-      .grid-half { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-        gap: 35px; 
+      .card-full {
+        grid-column: span 2;
+      }
+      .grid-half {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 35px;
       }
 
       .guide-btn {
@@ -260,13 +288,18 @@
         background: var(--accent-color);
       }
 
-      .trigger-btn:active { transform: translateY(1px); }
-      
+      .trigger-btn:active {
+        transform: translateY(1px);
+      }
+
       /* Noise Texture Overlay */
       body::after {
-        content: "";
+        content: '';
         position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         opacity: 0.03;
         pointer-events: none;
@@ -348,7 +381,10 @@
         display: none;
         position: fixed;
         z-index: 1000;
-        left: 0; top: 0; width: 100%; height: 100%;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
         background-color: rgba(0, 0, 0, 0.8);
         backdrop-filter: blur(10px);
         overflow-y: auto;
@@ -362,7 +398,9 @@
         width: 85%;
         max-width: 900px;
         border-radius: 32px;
-        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 242, 255, 0.05);
+        box-shadow:
+          0 40px 100px rgba(0, 0, 0, 0.8),
+          0 0 40px rgba(0, 242, 255, 0.05);
       }
 
       /* Progress Bar */
@@ -428,34 +466,77 @@
 
       /* Responsive Adaptations */
       @media (max-width: 850px) {
-        body { padding: 25px 20px; }
-        .header { flex-direction: column; gap: 24px; text-align: center; }
-        .header h1 { font-size: 1.6rem; }
-        .trigger-btn { margin-left: 0; width: 100%; }
-        .status-banner { padding: 15px; gap: 12px; }
+        body {
+          padding: 25px 20px;
+        }
+        .header {
+          flex-direction: column;
+          gap: 24px;
+          text-align: center;
+        }
+        .header h1 {
+          font-size: 1.6rem;
+        }
+        .trigger-btn {
+          margin-left: 0;
+          width: 100%;
+        }
+        .status-banner {
+          padding: 15px;
+          gap: 12px;
+        }
       }
 
       @media (max-width: 480px) {
-        .header h1 { font-size: 1.1rem; }
-        .guide-btn { padding: 8px 12px; font-size: 0.75rem; }
-        .trigger-btn { font-size: 0.9rem; padding: 10px 20px; }
+        .header h1 {
+          font-size: 1.1rem;
+        }
+        .guide-btn {
+          padding: 8px 12px;
+          font-size: 0.75rem;
+        }
+        .trigger-btn {
+          font-size: 0.9rem;
+          padding: 10px 20px;
+        }
       }
     </style>
   </head>
   <body>
     <div class="header">
       <div>
-        <h1>
-          AI BRAINSTORMING <span style="font-weight: 300; opacity: 0.6">WAR ROOM</span>
-        </h1>
-        <div style="margin-top: 10px; display: flex; align-items: center; gap: 15px;">
-           <span id="aiModelBadge" style="font-size: 0.65rem; color: var(--accent-color); border: 1px solid rgba(0,242,255,0.3); padding: 2px 8px; border-radius: 4px; display: none; vertical-align: middle; font-family: 'Orbitron', sans-serif;">DETECTING HARDWARE...</span>
-           <span id="currentSessionTopic" style="font-size: 0.85rem; color: var(--accent-color); font-weight: 600;">[STATUS: READY]</span>
+        <h1>AI BRAINSTORMING <span style="font-weight: 300; opacity: 0.6">WAR ROOM</span></h1>
+        <div style="margin-top: 10px; display: flex; align-items: center; gap: 15px">
+          <span
+            id="aiModelBadge"
+            style="
+              font-size: 0.65rem;
+              color: var(--accent-color);
+              border: 1px solid rgba(0, 242, 255, 0.3);
+              padding: 2px 8px;
+              border-radius: 4px;
+              display: none;
+              vertical-align: middle;
+              font-family: 'Orbitron', sans-serif;
+            "
+            >DETECTING HARDWARE...</span
+          >
+          <span
+            id="currentSessionTopic"
+            style="font-size: 0.85rem; color: var(--accent-color); font-weight: 600"
+            >[STATUS: READY]</span
+          >
         </div>
       </div>
-      <div style="display: flex; gap: 12px;">
+      <div style="display: flex; gap: 12px">
         <button class="guide-btn" onclick="openHelp()">操作手冊 [HELP]</button>
-        <button class="guide-btn" onclick="resetUI()" style="border-style: dashed; color: #ff6666; border-color: #ff6666;">強刷新 [RESET]</button>
+        <button
+          class="guide-btn"
+          onclick="resetUI()"
+          style="border-style: dashed; color: #ff6666; border-color: #ff6666"
+        >
+          強刷新 [RESET]
+        </button>
       </div>
     </div>
 
@@ -463,8 +544,12 @@
       <div class="status-icon">🚀</div>
       <div class="status-text">
         <div class="status-title">系統導引 (System Guide)</div>
-        <div id="statusMessage" class="status-desc">準備就緒。請在下方 [Master Console] 輸入議題，或從右側選單載入「戰略劇本」。</div>
-        <div id="statusCaution" class="caution-text">※ 注意：開始前請確認 AI 團隊配置符合議題需求。</div>
+        <div id="statusMessage" class="status-desc">
+          準備就緒。請在下方 [Master Console] 輸入議題，或從右側選單載入「戰略劇本」。
+        </div>
+        <div id="statusCaution" class="caution-text">
+          ※ 注意：開始前請確認 AI 團隊配置符合議題需求。
+        </div>
       </div>
     </div>
 
@@ -475,7 +560,11 @@
         <div style="display: flex; flex-direction: column; gap: 15px">
           <div>
             <label class="label-text">決策智慧領域 (Strategic Workspace)</label>
-            <select id="assetSwitcher" onchange="switchWorkspace(this.value)" style="width: 100%; border-color: var(--accent-color);">
+            <select
+              id="assetSwitcher"
+              onchange="switchWorkspace(this.value)"
+              style="width: 100%; border-color: var(--accent-color)"
+            >
               <option value="default">🌐 核心戰略 (General Strategy)</option>
               <option value="product">📦 產品研發 (Product & Tech)</option>
               <option value="growth">📈 市場成長 (Market & Growth)</option>
@@ -484,7 +573,7 @@
           </div>
           <div>
             <label class="label-text">分析模式 (Analysis Mode)</label>
-            <select id="analysisMode" style="width: 100%; border-color: var(--accent-purple);">
+            <select id="analysisMode" style="width: 100%; border-color: var(--accent-purple)">
               <option value="default">💬 一般對話 (Conversational)</option>
               <option value="swot">📊 SWOT 分析 (Structured)</option>
               <option value="pestel">🌍 PESTEL 分析 (Strategic)</option>
@@ -498,11 +587,19 @@
       <div class="card card-purple">
         <div style="display: flex; justify-content: space-between; align-items: start">
           <h2 style="color: var(--accent-purple)">系統智慧憲法 (Constitution)</h2>
-          <span id="const-version" style="font-size: var(--font-tiny); color: var(--text-dim)">v0</span>
+          <span id="const-version" style="font-size: var(--font-tiny); color: var(--text-dim)"
+            >v0</span
+          >
         </div>
         <div
           id="constitutionBox"
-          style="font-size: var(--font-small); line-height: 1.6; color: var(--text-main); min-height: 80px; white-space: pre-line;"
+          style="
+            font-size: var(--font-small);
+            line-height: 1.6;
+            color: var(--text-main);
+            min-height: 80px;
+            white-space: pre-line;
+          "
         >
           尚未進行智慧提煉...
         </div>
@@ -529,10 +626,23 @@
 
       <!-- 主理人控制台 (Master Console) -->
       <div class="card card-accent card-full">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+          "
+        >
           <h2 style="color: var(--accent-color); margin: 0">主理人控制台 (Master Console)</h2>
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <select id="scenarioSelector" onchange="loadScenario()" style="border-color: var(--accent-purple); color: var(--text-main); height: 45px;">
+          <div style="display: flex; gap: 10px; align-items: center">
+            <select
+              id="scenarioSelector"
+              onchange="loadScenario()"
+              style="border-color: var(--accent-purple); color: var(--text-main); height: 45px"
+            >
               <option value="">📂 載入戰略劇本 (Load Playbook)...</option>
               <optgroup label="💼 商業與職場 (Business & Career)">
                 <option value="crisis">🔥 【危機公關】品牌聲譽修復</option>
@@ -563,10 +673,27 @@
         <div class="grid-half">
           <div>
             <label class="label-text">針對議題目標 (Session Goal / Directive)</label>
-            <input type="text" id="sessionTopic" placeholder="議題主題，例如: 品牌轉型策略" style="width: 100%; margin-bottom: 12px; border-color: var(--accent-color);">
-            <textarea id="sessionContext" placeholder="討論目標或補充背景... (隨時修改並按下方更新)" style="width: 100%; height: 100px;"></textarea>
+            <input
+              type="text"
+              id="sessionTopic"
+              placeholder="議題主題，例如: 品牌轉型策略"
+              style="width: 100%; margin-bottom: 12px; border-color: var(--accent-color)"
+            />
+            <textarea
+              id="sessionContext"
+              placeholder="討論目標或補充背景... (隨時修改並按下方更新)"
+              style="width: 100%; height: 100px"
+            ></textarea>
           </div>
-          <div style="display: flex; flex-direction: column; justify-content: flex-start; gap: 15px; padding-top: 25px;">
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              gap: 15px;
+              padding-top: 25px;
+            "
+          >
             <button
               id="updateGoalBtn"
               onclick="updateSessionGoal()"
@@ -585,7 +712,17 @@
             >
               更新當前議題 [UPDATE GOAL]
             </button>
-            <div style="font-size: var(--font-tiny); color: var(--text-dim); line-height: 1.5; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; border-left: 3px solid var(--accent-color);">
+            <div
+              style="
+                font-size: var(--font-tiny);
+                color: var(--text-dim);
+                line-height: 1.5;
+                background: rgba(0, 0, 0, 0.2);
+                padding: 10px;
+                border-radius: 8px;
+                border-left: 3px solid var(--accent-color);
+              "
+            >
               ※ 指令導引：會議中修改左側描述後按上方按鈕，即時改變 AI 專家的對策方向。
             </div>
           </div>
@@ -716,15 +853,26 @@
 
     <!-- 全功能導覽彈窗 (Full Guide Modal) -->
     <div id="fullGuideModal" class="modal">
-      <div class="modal-content" style="max-width: 900px;">
+      <div class="modal-content" style="max-width: 900px">
         <span class="close" onclick="closeFullGuide()">&times;</span>
         <div class="guide-body">
-          <h1 style="color: var(--accent-color); font-family: 'Orbitron', sans-serif; text-align: center; border: none;">戰略大腦會議室：全功能與最佳實踐</h1>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+          <h1
+            style="
+              color: var(--accent-color);
+              font-family: 'Orbitron', sans-serif;
+              text-align: center;
+              border: none;
+            "
+          >
+            戰略大腦會議室：全功能與最佳實踐
+          </h1>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px">
             <div>
-              <h2 style="border-left: 4px solid var(--accent-color); padding-left: 10px;">🎯 核心功能 (Core Features)</h2>
-              <ul style="font-size: 0.9rem;">
+              <h2 style="border-left: 4px solid var(--accent-color); padding-left: 10px">
+                🎯 核心功能 (Core Features)
+              </h2>
+              <ul style="font-size: 0.9rem">
                 <li><strong>多代理博弈內閣</strong>：模擬不同部門主管的利益衝突與共識達成。</li>
                 <li><strong>結構化分析引擎</strong>：內建 SWOT、PESTEL 與抗脆弱風險評估框架。</li>
                 <li><strong>SSE 實時串流</strong>：即時觀察 AI 思考過程，如同真實會議。</li>
@@ -732,9 +880,13 @@
               </ul>
             </div>
             <div>
-              <h2 style="border-left: 4px solid var(--accent-purple); padding-left: 10px;">🌟 專案用途 (Purposes)</h2>
-              <ul style="font-size: 0.9rem;">
-                <li><strong>壓力測試</strong>：在實際執行前，讓 AI 團隊模擬可能的反對意見與風險。</li>
+              <h2 style="border-left: 4px solid var(--accent-purple); padding-left: 10px">
+                🌟 專案用途 (Purposes)
+              </h2>
+              <ul style="font-size: 0.9rem">
+                <li>
+                  <strong>壓力測試</strong>：在實際執行前，讓 AI 團隊模擬可能的反對意見與風險。
+                </li>
                 <li><strong>創意發散</strong>：透過跨領域 AI 專家的對話，打破思考盲點。</li>
                 <li><strong>決策記錄</strong>：自動生成 Markdown 格式的正式會議紀錄。</li>
                 <li><strong>知識傳承</strong>：透過憲法機制，讓系統越用越聰明。</li>
@@ -742,13 +894,29 @@
             </div>
           </div>
 
-          <h2 style="text-align: center; margin-top: 40px; color: var(--accent-color); border: none;">💡 最佳使用方法 (Best Practices)</h2>
-          <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px;">
+          <h2
+            style="text-align: center; margin-top: 40px; color: var(--accent-color); border: none"
+          >
+            💡 最佳使用方法 (Best Practices)
+          </h2>
+          <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 10px">
             <ol>
-              <li><strong>精確設計團隊</strong>：針對財務議題請加入「財務分析師」，技術議題請加入「CTO」。</li>
-              <li><strong>動態引導目標</strong>：在對話過程中，若發現 AI 偏離重點，應及時修改 [討論目標] 並點擊 [UPDATE]。</li>
-              <li><strong>強制反派角色</strong>：在角色設定中加入「魔鬼代言人」，能大幅提升方案的抗脆弱性。</li>
-              <li><strong>定期智慧進化</strong>：累積 3-5 場高品質會議後，務必執行 [EVOLVE] 以優化系統底層邏輯。</li>
+              <li>
+                <strong>精確設計團隊</strong
+                >：針對財務議題請加入「財務分析師」，技術議題請加入「CTO」。
+              </li>
+              <li>
+                <strong>動態引導目標</strong>：在對話過程中，若發現 AI 偏離重點，應及時修改
+                [討論目標] 並點擊 [UPDATE]。
+              </li>
+              <li>
+                <strong>強制反派角色</strong
+                >：在角色設定中加入「魔鬼代言人」，能大幅提升方案的抗脆弱性。
+              </li>
+              <li>
+                <strong>定期智慧進化</strong>：累積 3-5 場高品質會議後，務必執行 [EVOLVE]
+                以優化系統底層邏輯。
+              </li>
             </ol>
           </div>
         </div>
@@ -774,6 +942,12 @@
           name: '業務部主管',
           role: '負責客戶需求釐清、訂單交期協調與市場反饋',
           color: '#00ff00',
+        },
+        {
+          id: 'ai-mfg',
+          name: '製造部主管',
+          role: '負責生產排程、生產設備與人員調度、庫存管理、生產原物料採購',
+          color: '#EF4444',
         },
       ];
       let currentSessionId = null;
@@ -885,10 +1059,10 @@
         box.style.opacity = '0.5';
 
         try {
-          const res = await fetch('/api/distill', { 
+          const res = await fetch('/api/distill', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ assetId: currentWorkspace })
+            body: JSON.stringify({ assetId: currentWorkspace }),
           });
           const data = await res.json();
           if (data.success) {
@@ -910,12 +1084,12 @@
         try {
           const res = await fetch('/api/team');
           if (!res.ok) throw new Error(`API returned ${res.status}`);
-          
-          const contentType = res.headers.get("content-type");
-          if (!contentType || !contentType.includes("application/json")) {
-            throw new Error("API did not return JSON");
+
+          const contentType = res.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('API did not return JSON');
           }
-          
+
           currentTeam = await res.json();
           renderTeam();
         } catch (err) {
@@ -1016,18 +1190,23 @@
         updateBtn.disabled = false;
         updateBtn.style.background = 'var(--accent-color)';
         updateBtn.style.color = 'black';
-        
+
         progressContainer.style.display = 'block';
         progressFill.style.width = '0%';
         progressLabel.innerText = 'FLYWHEEL MOMENTUM: 0%';
 
         // Update Guided Tip
-        updateStatus('🤔', '會議進行中...', 'AI 團隊正在針對議題進行多輪辯論。您可以觀察下方各專家的即時見解。', '※ 提示：您可以隨時修改「討論目標」並點擊 [UPDATE] 來調整會議航向。');
+        updateStatus(
+          '🤔',
+          '會議進行中...',
+          'AI 團隊正在針對議題進行多輪辯論。您可以觀察下方各專家的即時見解。',
+          '※ 提示：您可以隨時修改「討論目標」並點擊 [UPDATE] 來調整會議航向。',
+        );
 
         const url = `/api/brainstorm-stream?topic=${encodeURIComponent(
-          topic
+          topic,
         )}&context=${encodeURIComponent(
-          context
+          context,
         )}&sessionId=${currentSessionId}&analysisMode=${analysisMode}&assetId=${currentWorkspace}`;
         const eventSource = new EventSource(url);
 
@@ -1039,19 +1218,19 @@
             console.error('Failed to parse SSE data:', e);
             return;
           }
-          
+
           if (data.type === 'ROUND_START') {
             currentTeam.forEach((m) => {
-               const spinner = document.getElementById(`spinner-${m.id}`);
-               const card = spinner.closest('.card');
-               if (spinner) spinner.style.display = 'block';
-               if (card) card.classList.add('thinking-active');
+              const spinner = document.getElementById(`spinner-${m.id}`);
+              const card = spinner.closest('.card');
+              if (spinner) spinner.style.display = 'block';
+              if (card) card.classList.add('thinking-active');
             });
           } else if (data.type === 'THOUGHT' && data.memberId) {
             const histDiv = document.getElementById(`history-${data.memberId}`);
             const spinner = document.getElementById(`spinner-${data.memberId}`);
             const card = histDiv.closest('.card');
-            
+
             const msg = document.createElement('div');
             msg.innerHTML = `<span style="color:var(--text-dim); font-size:0.7rem;">[Round ${data.round || ''}]</span><br>${data.message}`;
             msg.style.marginBottom = '10px';
@@ -1060,7 +1239,7 @@
             msg.style.paddingBottom = '5px';
             histDiv.appendChild(msg);
             histDiv.scrollTop = histDiv.scrollHeight;
-            
+
             if (spinner) spinner.style.display = 'none';
             if (card) card.classList.remove('thinking-active');
           } else if (data.type === 'THOUGHT') {
@@ -1073,13 +1252,19 @@
           } else if (data.type === 'CONSENSUS') {
             document.getElementById('progressFill').style.width = '100%';
             document.getElementById('progressLabel').innerText = `FLYWHEEL MOMENTUM: 100%`;
-            document.getElementById('summaryBox').innerText = '【共識檢核】\n' + data.message + '\n\n正在產出全案執行計畫...';
+            document.getElementById('summaryBox').innerText =
+              '【共識檢核】\n' + data.message + '\n\n正在產出全案執行計畫...';
           } else if (data.type === 'SUMMARY') {
             document.getElementById('progressFill').style.width = '100%';
             document.getElementById('progressLabel').innerText = `FLYWHEEL MOMENTUM: 100%`;
             document.getElementById('summaryBox').innerText = data.message;
             document.getElementById('summarySpinner').style.display = 'none';
-            updateStatus('🎯', '計畫已產出', '首席戰略官已完成全案總結與行動指南。請查閱下方的 [Action Plan]。', '※ 建議：點擊右側的 [EVOLVE] 將此經驗提煉為系統憲法，或點擊 [RESET UI] 開始新議題。');
+            updateStatus(
+              '🎯',
+              '計畫已產出',
+              '首席戰略官已完成全案總結與行動指南。請查閱下方的 [Action Plan]。',
+              '※ 建議：點擊右側的 [EVOLVE] 將此經驗提煉為系統憲法，或點擊 [RESET UI] 開始新議題。',
+            );
           } else if (data.type === 'COMPLETE') {
             document.getElementById('progressFill').style.width = '100%';
             eventSource.close();
@@ -1090,7 +1275,9 @@
             updateBtn.style.color = '#888';
             loadHistory();
             // Final cleanup of pulses
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('thinking-active'));
+            document
+              .querySelectorAll('.card')
+              .forEach((c) => c.classList.remove('thinking-active'));
           } else if (data.type === 'ERROR') {
             eventSource.close();
             alert(data.message);
@@ -1105,7 +1292,12 @@
           btn.disabled = false;
           btn.innerText = '連線中斷，請重試 [RETRY]';
           document.getElementById('summarySpinner').style.display = 'none';
-          updateStatus('⚠️', '連線異常', '與 AI 內閣的連線已中斷。可能是網路波動或伺服器正在重啟。', '※ 建議：檢查後端服務狀態後點擊 RETRY 重新啟動議題。');
+          updateStatus(
+            '⚠️',
+            '連線異常',
+            '與 AI 內閣的連線已中斷。可能是網路波動或伺服器正在重啟。',
+            '※ 建議：檢查後端服務狀態後點擊 RETRY 重新啟動議題。',
+          );
         };
       }
 
@@ -1133,7 +1325,7 @@
       async function switchWorkspace(val) {
         currentWorkspace = val;
         console.log('Switching to Workspace:', currentWorkspace);
-        
+
         // Visual feedback
         const box = document.getElementById('constitutionBox');
         const list = document.getElementById('experienceList');
@@ -1147,7 +1339,12 @@
           if (list) list.style.opacity = '1';
         }, 300);
 
-        updateStatus('🌐', '領域已切換', `目前已進入 [${val}] 決策領域。該領域的歷史紀錄與憲法原則已載入完畢。`, '※ 注意：不同領域的 AI 累積智慧相互獨立。');
+        updateStatus(
+          '🌐',
+          '領域已切換',
+          `目前已進入 [${val}] 決策領域。該領域的歷史紀錄與憲法原則已載入完畢。`,
+          '※ 注意：不同領域的 AI 累積智慧相互獨立。',
+        );
       }
 
       function openHelp() {
@@ -1166,8 +1363,10 @@
           if (badge) {
             const isCloud = data.tier === 'CLOUD';
             const icon = isCloud ? '☁️' : '📥';
-            const glow = isCloud ? '0 0 10px rgba(189, 0, 255, 0.4)' : '0 0 10px rgba(0, 242, 255, 0.4)';
-            
+            const glow = isCloud
+              ? '0 0 10px rgba(189, 0, 255, 0.4)'
+              : '0 0 10px rgba(0, 242, 255, 0.4)';
+
             badge.innerHTML = `<span style="margin-right:5px">${icon}</span> AI: ${data.activeModel.toUpperCase()} (${data.tier})`;
             badge.title = data.reason;
             badge.style.display = 'inline-block';
@@ -1189,9 +1388,9 @@
         try {
           const res = await fetch(`/api/experience?assetId=${currentWorkspace}`);
           if (!res.ok) return; // Silent return for 404
-          
-          const contentType = res.headers.get("content-type");
-          if (!contentType || !contentType.includes("application/json")) return;
+
+          const contentType = res.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) return;
 
           const exps = await res.json();
           const list = document.getElementById('experienceList');
@@ -1230,7 +1429,8 @@
 
       function updateStatus(icon, title, desc, caution) {
         document.getElementById('dynamicStatus').querySelector('.status-icon').innerText = icon;
-        document.getElementById('statusMessage').previousElementSibling.innerText = `系統導引 (${title})`;
+        document.getElementById('statusMessage').previousElementSibling.innerText =
+          `系統導引 (${title})`;
         document.getElementById('statusMessage').innerText = desc;
         document.getElementById('statusCaution').innerText = caution || '';
       }
